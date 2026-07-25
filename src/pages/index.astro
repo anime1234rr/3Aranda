@@ -1,0 +1,74 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
+import SearchBar from "../components/SearchBar.astro";
+
+// Aquí podrías luego hacer un fetch a tu DB
+const recentMemories = []; 
+---
+
+<Layout title="Inicio" currentPath="/">
+  <!-- Hero / Bienvenida con diseño moderno -->
+  <section class="mb-12 relative overflow-hidden">
+    <div class="absolute top-0 left-1/4 -z-10 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl"></div>
+    
+    <div class="rounded-3xl border border-stone-800 bg-stone-900/50 p-8 md:p-12">
+      <div class="max-w-2xl">
+        <h2 class="text-4xl font-black text-stone-100 leading-tight md:text-5xl">
+          los recuerdo de <span class="text-amber-500 italic">Aranda.</span>
+        </h2>
+        <p class="text-stone-400 mt-4 text-lg font-medium">
+          Gestiona, y guarda las imagenes y videos que guardes 
+        </p>
+        
+        <div class="flex flex-wrap gap-4 mt-8">
+          <a
+            href="/upload"
+            class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-6 py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-amber-500/20"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+            Subir nuevo archivo
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Buscador Integrado -->
+  <section class="mb-12">
+    <SearchBar placeholder="Buscar documentos por título, categoría o etiquetas..." />
+  </section>
+
+  <!-- Sección de Contenido -->
+  <section>
+    <div class="flex items-center justify-between mb-8 border-b border-stone-800 pb-4">
+      <h2 class="text-2xl font-bold text-stone-100 flex items-center gap-2">
+        <span class="text-amber-500">#</span> Documentos recientes
+      </h2>
+      <a href="/docs" class="text-sm text-stone-400 hover:text-amber-500 font-bold transition-colors">
+        Ver biblioteca completa →
+      </a>
+    </div>
+
+    {recentMemories.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {recentMemories.map((memory) => (
+          <Card {...memory} />
+        ))}
+      </div>
+    ) : (
+      /* Estado vacío (Empty State) */
+      <div class="flex flex-col items-center justify-center py-20 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
+        <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+          </svg>
+        </div>
+        <p class="text-stone-400 font-medium">Aún no hay documentos subidos</p>
+        <a href="/upload" class="text-amber-500 text-sm mt-2 font-bold hover:underline">Comienza aquí</a>
+      </div>
+    )}
+  </section>
+</Layout>
