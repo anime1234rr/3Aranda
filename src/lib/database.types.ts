@@ -125,6 +125,10 @@ export interface Database {
         Args: { query: string };
         Returns: unknown;
       };
+      obtener_email_por_usuario: {
+        Args: { p_nombre_usuario: string };
+        Returns: string;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

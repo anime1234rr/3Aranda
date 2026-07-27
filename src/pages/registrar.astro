@@ -4,6 +4,8 @@ import { Home, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { buttonVariants } from "../components/ui/button";
+
+const error = Astro.url.searchParams.get("error");
 ---
 
 <Layout title="Registrarse" currentPath="/registrar" showNav={false}>
@@ -22,6 +24,12 @@ import { buttonVariants } from "../components/ui/button";
           <p class="text-stone-400 text-sm mt-1 font-medium">Crea tu cuenta familiar 💛</p>
         </div>
 
+        {error && (
+          <div class="mb-5 rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-sm text-red-300 font-medium">
+            {error}
+          </div>
+        )}
+
         <!-- Formulario -->
         <form method="POST" action="/api/auth/register" class="space-y-5">
           <!-- Nombre de usuario -->
@@ -35,7 +43,7 @@ import { buttonVariants } from "../components/ui/button";
                 type="text"
                 id="nombre_usuario"
                 name="nombre_usuario"
-                placeholder="tu_nombre"
+                placeholder="tu nombre"
                 autoComplete="username"
                 className="pl-10"
               />
@@ -73,6 +81,7 @@ import { buttonVariants } from "../components/ui/button";
                 name="password"
                 placeholder="••••••••"
                 autoComplete="new-password"
+                minLength={6}
                 className="pl-10 pr-10"
               />
               <button
@@ -85,6 +94,7 @@ import { buttonVariants } from "../components/ui/button";
                 <EyeOff className="w-4 h-4 hidden" data-icon="eye-off" />
               </button>
             </div>
+            <p class="text-xs text-stone-500 mt-1.5">Mínimo 6 caracteres.</p>
           </div>
 
           <button

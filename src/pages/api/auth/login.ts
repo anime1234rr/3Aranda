@@ -10,11 +10,26 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   }
 
   const formData = await request.formData();
-  const email = formData.get("email")?.toString();
+  const identificador = formData.get("identificador")?.toString().trim();
   const password = formData.get("password")?.toString();
 
-  if (!email || !password) {
-    return new Response("Correo y contraseña obligatorios", { status: 400 });
+  if (!identificador || !password) {
+    return redirect(`/iniciar_sesion?error=${encodeURIComponent("Usuario/correo y contraseña obligatorios")}`);
+  }
+
+  let email = identificador;
+
+  if (!identificador.includes("@")) {
+    const { data: emailEncontrado, error: rpcError } = await supabase.rpc(
+      "obtener_email_por_usuario",
+      { p_nombre_usuario: identificador }
+    );
+
+    if (rpcError || !emailEncontrado) {
+      return redirect(`/iniciar_sesion?error=${encodeURIComponent("Usuario o contraseña incorrectos")}`);
+    }
+
+    email = emailEncontrado;
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -23,7 +38,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   });
 
   if (error) {
-    return new Response(error.message, { status: 500 });
+    return redirect(`/iniciar_sesion?error=${encodeURIComponent(error.message)}`);
   }
 
   const { access_token, refresh_token } = data.session;

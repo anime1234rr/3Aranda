@@ -15,7 +15,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const password = formData.get("password")?.toString();
 
   if (!nombreUsuario || !email || !password) {
-    return new Response("Nombre de usuario, correo y contraseña obligatorios", { status: 400 });
+    return redirect(`/registrar?error=${encodeURIComponent("Nombre de usuario, correo y contraseña obligatorios")}`);
+  }
+
+  if (password.length < 6) {
+    return redirect(
+      `/registrar?error=${encodeURIComponent("La contraseña debe tener al menos 6 caracteres")}`
+    );
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -25,11 +31,11 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   });
 
   if (error) {
-    return new Response(error.message, { status: 500 });
+    return redirect(`/registrar?error=${encodeURIComponent(error.message)}`);
   }
 
   if (!data.user) {
-    return new Response("No se pudo crear la cuenta", { status: 500 });
+    return redirect(`/registrar?error=${encodeURIComponent("No se pudo crear la cuenta")}`);
   }
 
   // La fila en perfiles la crea el trigger on_auth_user_created (security definer),
