@@ -7,5 +7,5 @@ export const GET: APIRoute = async ({ cookies, redirect }) => {
   cookies.delete("sb-refresh-token", { path: "/" });
 
   // devuelve una respuesta 302 automáticamente.
-  return redirect("/login");
+  return redirect("/iniciar_sesion");
 };

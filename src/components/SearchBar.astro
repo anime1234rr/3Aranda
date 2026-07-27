@@ -1,4 +1,7 @@
 ---
+import { Search } from "lucide-react";
+import { buttonVariants } from "./ui/button";
+
 export interface Props {
   placeholder?: string;
   value?: string;
@@ -14,14 +17,7 @@ const {
   <div class="relative group">
     <!-- Icono lupa -->
     <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-      <svg
-        class="w-5 h-5 text-amber-400 group-focus-within:text-amber-600 transition-colors duration-200"
-        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-      </svg>
+      <Search className="w-5 h-5 text-amber-400 group-focus-within:text-amber-300 transition-colors duration-200" strokeWidth={2.5} />
     </div>
 
     <!-- Input -->
@@ -31,16 +27,16 @@ const {
       name="q"
       value={value}
       placeholder={placeholder}
-      class="w-full pl-12 pr-16 py-3.5 bg-amber-50 border-2 border-amber-200 rounded-2xl text-stone-700 placeholder-stone-400 text-sm font-medium
-             focus:outline-none focus:border-amber-400 focus:bg-white focus:shadow-md
-             hover:border-amber-300 transition-all duration-200"
+      class="w-full pl-12 pr-24 py-3.5 bg-stone-900 border-2 border-stone-800 rounded-2xl text-stone-100 placeholder-stone-500 text-sm font-medium
+             focus:outline-none focus:border-amber-500/60 focus:shadow-md
+             hover:border-stone-700 transition-all duration-200"
       autocomplete="off"
     />
 
     <!-- Botón buscar -->
     <button
       type="submit"
-      class="absolute inset-y-0 right-2 my-2 px-4 bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold text-sm rounded-xl transition-all duration-200 hover:shadow-sm active:scale-95"
+      class:list={[buttonVariants({ variant: "default" }), "absolute inset-y-0 right-2 my-2 h-auto px-4"]}
       aria-label="Buscar"
     >
       Buscar
@@ -52,7 +48,7 @@ const {
     {["Navidad", "Cumpleaños", "Verano 2024", "Abuelos"].map((tag) => (
       <button
         type="button"
-        class="text-xs px-3 py-1 bg-white border border-amber-200 text-amber-700 rounded-full hover:bg-amber-50 hover:border-amber-400 transition-all duration-150 font-medium"
+        class="text-xs px-3 py-1 bg-stone-900 border border-stone-800 text-amber-400 rounded-full hover:bg-stone-800 hover:border-amber-500/40 transition-all duration-150 font-medium"
         onclick={`document.getElementById('family-search').value='${tag}'`}
       >
         {tag}

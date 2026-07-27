@@ -1,0 +1,73 @@
+---
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import { User, LogOut, Star, Shield } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import { buttonVariants } from "../components/ui/button";
+
+const accessToken = Astro.cookies.get("sb-access-token")?.value;
+
+if (!accessToken) {
+  return Astro.redirect("/iniciar_sesion");
+}
+
+const { data: userData, error: userError } = await supabase.auth.getUser(accessToken);
+
+if (userError || !userData.user) {
+  return Astro.redirect("/iniciar_sesion");
+}
+
+const { data: perfil } = await supabase
+  .from("perfiles")
+  .select("*")
+  .eq("id", userData.user.id)
+  .single();
+---
+
+<Layout title="Mi perfil" currentPath="/perfil">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-stone-900 rounded-3xl border border-stone-800 shadow-md p-8">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-inner">
+          <User className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold text-stone-100">
+            {perfil?.nombre_completo || perfil?.nombre_usuario || userData.user.email}
+          </h1>
+          <p class="text-sm text-stone-400 font-medium">@{perfil?.nombre_usuario ?? "sin_nombre"}</p>
+        </div>
+      </div>
+
+      {perfil?.biografia && (
+        <p class="text-stone-400 text-sm mt-6 leading-relaxed">{perfil.biografia}</p>
+      )}
+
+      <div class="grid grid-cols-2 gap-4 mt-8">
+        <div class="bg-stone-950/40 border border-stone-800 rounded-2xl p-4 flex items-center gap-3">
+          <Star className="w-5 h-5 text-amber-400" />
+          <div>
+            <p class="text-lg font-extrabold text-stone-100">{perfil?.puntos ?? 0}</p>
+            <p class="text-xs text-stone-500 font-medium">Puntos</p>
+          </div>
+        </div>
+        <div class="bg-stone-950/40 border border-stone-800 rounded-2xl p-4 flex items-center gap-3">
+          <Shield className="w-5 h-5 text-amber-400" />
+          <div>
+            <p class="text-lg font-extrabold text-stone-100 capitalize">{perfil?.rol ?? "usuario"}</p>
+            <p class="text-xs text-stone-500 font-medium">Rol</p>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="/api/signout"
+        class:list={[buttonVariants({ variant: "outline" }), "w-full h-auto py-3 mt-8"]}
+      >
+        <LogOut className="w-4 h-4" />
+        Cerrar sesión
+      </a>
+    </div>
+  </div>
+</Layout>

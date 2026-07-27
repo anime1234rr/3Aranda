@@ -5,8 +5,16 @@
     "src/env.d.ts"
   ],
   "compilerOptions": {
-    "types": ["astro/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": [
+      "astro/client"
+    ],
     "isolatedModules": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }

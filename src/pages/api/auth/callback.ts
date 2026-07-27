@@ -23,5 +23,5 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
     path: "/",
   });
 
-  return redirect("/signin");
+  return redirect("/perfil");
 };

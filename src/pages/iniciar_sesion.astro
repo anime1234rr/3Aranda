@@ -1,0 +1,107 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Home, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
+import { buttonVariants } from "../components/ui/button";
+---
+
+<Layout title="Entrar" currentPath="/iniciar_sesion" showNav={false}>
+  <div class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-md">
+
+      <!-- Card principal -->
+      <div class="bg-stone-900 rounded-3xl border border-stone-800 shadow-xl p-8">
+
+        <!-- Logo centrado -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+            <Home className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+          </div>
+          <h1 class="text-2xl font-extrabold text-amber-400">Accede a FamilyHub</h1>
+          <p class="text-stone-400 text-sm mt-1 font-medium">Solo para la familia 💛</p>
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST" action="/api/auth/login" class="space-y-5">
+          <!-- Email -->
+          <div>
+            <Label htmlFor="email" className="mb-1.5">Correo electrónico</Label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center text-amber-400 pointer-events-none">
+                <Mail className="w-4 h-4" />
+              </span>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="tu@correo.com"
+                autoComplete="email"
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <Label htmlFor="password">Contraseña</Label>
+              <a href="/recuperar" class="text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors">
+                ¿La olvidaste?
+              </a>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center text-amber-400 pointer-events-none">
+                <Lock className="w-4 h-4" />
+              </span>
+              <Input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="pl-10 pr-10"
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                aria-label="Mostrar contraseña"
+                class="absolute inset-y-0 right-3.5 flex items-center text-stone-400 hover:text-amber-400 transition-colors"
+              >
+                <Eye className="w-4 h-4" data-icon="eye" />
+                <EyeOff className="w-4 h-4 hidden" data-icon="eye-off" />
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class:list={[buttonVariants({ variant: "default" }), "w-full h-auto py-3 text-base"]}
+          >
+            Entrar
+          </button>
+        </form>
+
+        <p class="text-center text-sm text-stone-400 font-medium mt-6">
+          ¿No tienes cuenta?
+          <a href="/registrar" class="text-amber-400 hover:text-amber-300 font-bold">Regístrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const toggleBtn = document.getElementById("toggle-password");
+  const passwordInput = document.getElementById("password") as HTMLInputElement;
+  const eyeIcon = toggleBtn?.querySelector('[data-icon="eye"]');
+  const eyeOffIcon = toggleBtn?.querySelector('[data-icon="eye-off"]');
+
+  toggleBtn?.addEventListener("click", () => {
+    const willShow = passwordInput.type === "password";
+    passwordInput.type = willShow ? "text" : "password";
+    eyeIcon?.classList.toggle("hidden", willShow);
+    eyeOffIcon?.classList.toggle("hidden", !willShow);
+    toggleBtn.setAttribute("aria-label", willShow ? "Ocultar contraseña" : "Mostrar contraseña");
+  });
+</script>
