@@ -16,3 +16,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
   },
 });
+
+// Cliente por-petición que reenvía el token del usuario, para que las políticas
+// RLS (auth.uid() = usuario_id) se apliquen correctamente en lecturas/escrituras privadas.
+export function crearClienteConToken(accessToken: string) {
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+  });
+}

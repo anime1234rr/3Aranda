@@ -18,6 +18,8 @@ interface Diccionario {
   navEntrar: string;
   navSalir: string;
   notificaciones: string;
+  notificacionesVacio: string;
+  notificacionesMarcarLeidas: string;
   buscarPlaceholder: string;
   buscarBoton: string;
   buscarSugerencias: string[];
@@ -59,6 +61,8 @@ export const textos: Record<Idioma, Diccionario> = {
     navEntrar: "Entrar",
     navSalir: "Salir",
     notificaciones: "Notificaciones",
+    notificacionesVacio: "No tenés notificaciones",
+    notificacionesMarcarLeidas: "Marcar todas como leídas",
     buscarPlaceholder: "Buscar recuerdos, fechas, personas…",
     buscarBoton: "Buscar",
     buscarSugerencias: ["Navidad", "Cumpleaños", "Verano 2024", "Abuelos"],
@@ -106,6 +110,8 @@ export const textos: Record<Idioma, Diccionario> = {
     navEntrar: "Log in",
     navSalir: "Log out",
     notificaciones: "Notifications",
+    notificacionesVacio: "You have no notifications",
+    notificacionesMarcarLeidas: "Mark all as read",
     buscarPlaceholder: "Search memories, dates, people…",
     buscarBoton: "Search",
     buscarSugerencias: ["Christmas", "Birthday", "Summer 2024", "Grandparents"],

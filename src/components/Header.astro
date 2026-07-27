@@ -1,7 +1,8 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { Home, Bell } from "lucide-react";
+import { Home } from "lucide-react";
 import SubirRecuerdoDialog from "./SubirRecuerdoDialog.astro";
+import NotificacionesMenu from "./NotificacionesMenu.astro";
 import MenuDesplegable from "./MenuDesplegable";
 import { buttonVariants } from "./ui/button";
 import { idiomas, obtenerIdioma, textos } from "../lib/i18n";
@@ -37,13 +38,7 @@ const hrefsPorIdioma = Object.fromEntries(
     </div>
 
     <div class="flex items-center gap-3">
-      <button
-        class="relative bg-stone-900 border-2 border-stone-800 rounded-xl px-3 py-2 text-amber-400 hover:bg-stone-800 hover:border-amber-500/50 transition-all duration-200 flex items-center gap-1.5 text-sm font-semibold shadow-sm"
-        aria-label={t.notificaciones}
-      >
-        <Bell className="w-4 h-4" />
-        <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">3</span>
-      </button>
+      {user && <NotificacionesMenu locale={locale} />}
 
       {user ? (
         <SubirRecuerdoDialog locale={locale} />

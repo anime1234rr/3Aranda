@@ -1,12 +1,8 @@
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro/zod";
 import { randomUUID } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "../lib/database.types";
+import { crearClienteConToken } from "../lib/supabase";
 import { obtenerIdioma } from "../lib/i18n";
-
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 const CATEGORIAS_VALIDAS = ["navidad", "cumpleanos", "vacaciones", "familia", "logro", "otro"] as const;
 
@@ -26,6 +22,10 @@ const MENSAJES = {
     sinArchivos: "Select at least one file",
   },
 };
+
+function mensajeSinSesion(locale: string | undefined) {
+  return MENSAJES[obtenerIdioma(locale)].sinSesion;
+}
 
 export const server = {
   subirRecuerdo: defineAction({
@@ -52,12 +52,7 @@ export const server = {
         throw new ActionError({ code: "BAD_REQUEST", message: m.sinArchivos });
       }
 
-      // Cliente propio de esta petición: reenvía el token del usuario para que
-      // las políticas RLS (auth.uid() = usuario_id) se apliquen correctamente.
-      const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-        global: { headers: { Authorization: `Bearer ${accessToken}` } },
-      });
-
+      const supabase = crearClienteConToken(accessToken);
       const usuarioId = context.locals.user.id;
       const creados = [];
 
@@ -104,6 +99,29 @@ export const server = {
       }
 
       return { recuerdos: creados };
+    },
+  }),
+
+  marcarNotificacionesLeidas: defineAction({
+    input: z.object({ locale: z.string().optional() }).optional(),
+    handler: async (input, context) => {
+      const accessToken = context.cookies.get("sb-access-token")?.value;
+      if (!accessToken || !context.locals.user) {
+        throw new ActionError({ code: "UNAUTHORIZED", message: mensajeSinSesion(input?.locale) });
+      }
+
+      const supabase = crearClienteConToken(accessToken);
+      const { error } = await supabase
+        .from("notificaciones")
+        .update({ leida: true })
+        .eq("usuario_id", context.locals.user.id)
+        .eq("leida", false);
+
+      if (error) {
+        throw new ActionError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      }
+
+      return { ok: true };
     },
   }),
 };

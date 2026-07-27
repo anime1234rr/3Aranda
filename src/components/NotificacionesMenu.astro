@@ -1,0 +1,150 @@
+---
+import { Bell, Check } from "lucide-react";
+import { supabase, crearClienteConToken } from "../lib/supabase";
+import { textos, type Idioma } from "../lib/i18n";
+
+export interface Props {
+  locale: Idioma;
+}
+
+const { locale } = Astro.props;
+const t = textos[locale];
+const user = Astro.locals.user;
+const accessToken = Astro.cookies.get("sb-access-token")?.value;
+
+let notificaciones: {
+  id: string;
+  tipo: string;
+  mensaje: string;
+  leida: boolean;
+  creado_at: string;
+  remitente: { nombre_usuario: string | null; nombre_completo: string | null } | null;
+}[] = [];
+
+if (user && accessToken) {
+  const clientePropio = crearClienteConToken(accessToken);
+  const { data: filas } = await clientePropio
+    .from("notificaciones")
+    .select("*")
+    .eq("usuario_id", user.id)
+    .order("creado_at", { ascending: false })
+    .limit(20);
+
+  const remitenteIds = [...new Set((filas ?? []).map((f) => f.remitente_id).filter((id): id is string => !!id))];
+  const perfilesPorId = new Map<string, { nombre_usuario: string | null; nombre_completo: string | null }>();
+  if (remitenteIds.length > 0) {
+    const { data: perfilesData } = await supabase
+      .from("perfiles")
+      .select("id, nombre_usuario, nombre_completo")
+      .in("id", remitenteIds);
+    (perfilesData ?? []).forEach((p) => perfilesPorId.set(p.id, p));
+  }
+
+  notificaciones = (filas ?? []).map((f) => ({
+    id: f.id,
+    tipo: f.tipo,
+    mensaje: f.mensaje,
+    leida: f.leida,
+    creado_at: f.creado_at,
+    remitente: f.remitente_id ? perfilesPorId.get(f.remitente_id) ?? null : null,
+  }));
+}
+
+const noLeidas = notificaciones.filter((n) => !n.leida).length;
+const formateador = new Intl.DateTimeFormat(locale === "es" ? "es-ES" : "en-US", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+---
+
+<div class="relative" id="notificaciones-contenedor">
+  <button
+    type="button"
+    id="notificaciones-trigger"
+    aria-label={t.notificaciones}
+    aria-haspopup="menu"
+    class="relative bg-stone-900 border-2 border-stone-800 rounded-xl px-3 py-2 text-amber-400 hover:bg-stone-800 hover:border-amber-500/50 transition-all duration-200 flex items-center gap-1.5 text-sm font-semibold shadow-sm"
+  >
+    <Bell className="w-4 h-4" />
+    {noLeidas > 0 && (
+      <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+        {noLeidas > 9 ? "9+" : noLeidas}
+      </span>
+    )}
+  </button>
+
+  <div
+    id="notificaciones-panel"
+    role="menu"
+    class="hidden absolute right-0 top-full z-50 mt-2 w-80 max-h-96 overflow-y-auto rounded-2xl border border-stone-800 bg-stone-900 shadow-2xl"
+  >
+    <div class="flex items-center justify-between px-4 py-3 border-b border-stone-800">
+      <p class="text-xs font-bold uppercase tracking-widest text-stone-500">{t.notificaciones}</p>
+      {noLeidas > 0 && (
+        <button
+          type="button"
+          id="notificaciones-marcar-leidas"
+          class="flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
+        >
+          <Check className="w-3.5 h-3.5" /> {t.notificacionesMarcarLeidas}
+        </button>
+      )}
+    </div>
+
+    {notificaciones.length > 0 ? (
+      <ul class="divide-y divide-stone-800">
+        {notificaciones.map((n) => (
+          <li class:list={["px-4 py-3", !n.leida && "bg-amber-500/5"]}>
+            <div class="flex items-start gap-2">
+              {!n.leida && <span class="mt-1.5 w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>}
+              <div class:list={["min-w-0", n.leida && "pl-4"]}>
+                {n.remitente && (
+                  <p class="text-xs font-bold text-stone-300 truncate">
+                    {n.remitente.nombre_completo || n.remitente.nombre_usuario}
+                  </p>
+                )}
+                <p class="text-sm text-stone-200 leading-snug">{n.mensaje}</p>
+                <p class="text-xs text-stone-500 mt-1 font-medium">{formateador.format(new Date(n.creado_at))}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="px-4 py-8 text-center text-sm text-stone-500 font-medium">{t.notificacionesVacio}</p>
+    )}
+  </div>
+</div>
+
+<script>
+  import { actions } from "astro:actions";
+
+  document.addEventListener("astro:page-load", () => {
+    const contenedor = document.getElementById("notificaciones-contenedor");
+    const trigger = document.getElementById("notificaciones-trigger");
+    const panel = document.getElementById("notificaciones-panel");
+    const marcarLeidas = document.getElementById("notificaciones-marcar-leidas");
+
+    trigger?.addEventListener("click", () => {
+      panel?.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (contenedor && !contenedor.contains(e.target as Node)) {
+        panel?.classList.add("hidden");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") panel?.classList.add("hidden");
+    });
+
+    marcarLeidas?.addEventListener("click", async () => {
+      marcarLeidas.setAttribute("disabled", "true");
+      await actions.marcarNotificacionesLeidas({});
+      window.location.reload();
+    });
+  });
+</script>
