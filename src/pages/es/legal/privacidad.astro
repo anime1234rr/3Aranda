@@ -1,0 +1,53 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { ShieldCheck } from "lucide-react";
+---
+
+<Layout title="Privacidad">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+        <ShieldCheck className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+      </div>
+      <h1 class="text-2xl font-extrabold text-stone-100">Privacidad</h1>
+      <p class="text-stone-400 text-sm mt-1 font-medium">Cómo cuidamos tus datos y tus recuerdos</p>
+    </div>
+
+    <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6 space-y-6 text-sm leading-relaxed text-stone-400">
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Qué datos guardamos</h2>
+        <p>
+          Tu correo, nombre de usuario y contraseña (gestionados por Supabase Auth, nunca los vemos
+          en texto plano), y lo que vos subís: fotos, videos, títulos, descripciones y fechas de
+          tus recuerdos.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Cómo se resguardan tus archivos</h2>
+        <p>
+          Cada foto o video se guarda en un almacenamiento separado por usuario (tu propia carpeta),
+          protegido con políticas de seguridad a nivel de fila (RLS): solo vos podés subir o borrar
+          dentro de tu carpeta, y las contraseñas de acceso viajan siempre cifradas.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Quién puede ver tus recuerdos</h2>
+        <p>
+          Hoy los recuerdos que subís son visibles para cualquier persona que entre a la
+          plataforma, pensado para compartirlos dentro de la familia. No los vendemos ni
+          compartimos con terceros con fines comerciales.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Servicios que usamos</h2>
+        <p>
+          Alojamos la base de datos y los archivos en Supabase, y publicamos el sitio en Netlify.
+          Ninguno de los dos usa tus datos para publicidad.
+        </p>
+      </section>
+    </div>
+  </div>
+</Layout>

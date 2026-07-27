@@ -1,80 +1,10 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Card from "../components/Card.astro";
-import SearchBar from "../components/SearchBar.astro";
-import { Upload, Inbox } from "lucide-react";
-import { buttonVariants } from "../components/ui/button";
+export const prerender = false;
 
-// Aquí podrías luego hacer un fetch a tu DB
-const recentMemories: Array<{
-  title: string;
-  description?: string;
-  image?: string;
-  date?: string;
-  tag?: string;
-  tagColor?: "amber" | "rose" | "green" | "blue";
-  href?: string;
-}> = [];
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { idiomaPorDefecto } from "../lib/i18n";
+
+const locale = Astro.preferredLocale ?? idiomaPorDefecto;
+
+return Astro.redirect(getRelativeLocaleUrl(locale, "/"));
 ---
-
-<Layout title="2Aranda" currentPath="/">
-  <!-- Hero / Bienvenida con diseño moderno -->
-  <section class="mb-12 relative overflow-hidden">
-    <div class="absolute top-0 left-1/4 -z-10 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl"></div>
-    
-    <div class="rounded-3xl border border-stone-800 bg-stone-900/50 p-8 md:p-12">
-      <div class="max-w-2xl">
-        <h2 class="text-4xl font-black text-stone-100 leading-tight md:text-5xl">
-          los recuerdo de <span class="text-amber-500 italic">Aranda.</span>
-        </h2>
-        <p class="text-stone-400 mt-4 text-lg font-medium">
-          Gestiona, y guarda las imagenes y videos que guardes 
-        </p>
-        
-        <div class="flex flex-wrap gap-4 mt-8">
-          <a
-            href="/subir_imagen"
-            class:list={[buttonVariants({ variant: "default", size: "lg" }), "h-auto px-6 py-3 shadow-lg shadow-amber-500/20"]}
-          >
-            <Upload className="w-5 h-5" />
-            Subir nuevo archivo
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Buscador Integrado -->
-  <section class="mb-12">
-    <SearchBar placeholder="Buscar documentos por título, categoría o etiquetas..." />
-  </section>
-
-  <!-- Sección de Contenido -->
-  <section>
-    <div class="flex items-center justify-between mb-8 border-b border-stone-800 pb-4">
-      <h2 class="text-2xl font-bold text-stone-100 flex items-center gap-2">
-        <span class="text-amber-500">#</span> Documentos recientes
-      </h2>
-      <a href="/biblioteca_completa" class="text-sm text-stone-400 hover:text-amber-500 font-bold transition-colors">
-        Ver biblioteca completa →
-      </a>
-    </div>
-
-    {recentMemories.length > 0 ? (
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {recentMemories.map((memory) => (
-          <Card {...memory} />
-        ))}
-      </div>
-    ) : (
-      /* Estado vacío (Empty State) */
-      <div class="flex flex-col items-center justify-center py-20 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
-        <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
-          <Inbox className="w-10 h-10" strokeWidth={1.5} />
-        </div>
-        <p class="text-stone-400 font-medium">Aún no hay documentos subidos</p>
-        <a href="/subir_imagen" class="text-amber-500 text-sm mt-2 font-bold hover:underline">Comienza aquí</a>
-      </div>
-    )}
-  </section>
-</Layout>

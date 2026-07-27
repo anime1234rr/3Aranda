@@ -1,0 +1,52 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { Scale } from "lucide-react";
+---
+
+<Layout title="Términos">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+        <Scale className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+      </div>
+      <h1 class="text-2xl font-extrabold text-stone-100">Términos</h1>
+      <p class="text-stone-400 text-sm mt-1 font-medium">Las reglas básicas de uso de la plataforma</p>
+    </div>
+
+    <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6 space-y-6 text-sm leading-relaxed text-stone-400">
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Uso familiar</h2>
+        <p>
+          3Aranda está pensada para compartir recuerdos dentro del ámbito familiar. Cada cuenta es
+          personal e intransferible; sos responsable de lo que subís con tu usuario.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Contenido que subís</h2>
+        <p>
+          El contenido que subís (fotos, videos, textos) sigue siendo tuyo. Al subirlo, nos das
+          permiso para almacenarlo y mostrarlo dentro de la plataforma a otros miembros de la
+          familia. No subas contenido que no te pertenezca o que pueda dañar a terceros.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Servicio en desarrollo</h2>
+        <p>
+          La plataforma sigue en construcción y puede cambiar, tener interrupciones o errores. No
+          garantizamos disponibilidad permanente, aunque hacemos lo posible por cuidar tus
+          recuerdos.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Cuentas y acceso</h2>
+        <p>
+          Quien administra la cuenta familiar (rol "admin") puede moderar contenido inapropiado o
+          restringir el acceso si se incumplen estas reglas básicas.
+        </p>
+      </section>
+    </div>
+  </div>
+</Layout>

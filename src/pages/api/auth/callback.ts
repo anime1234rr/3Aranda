@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import { supabase } from "../../../lib/supabase";
+import { idiomaPorDefecto } from "../../../lib/i18n";
 
 export const GET: APIRoute = async ({ url, cookies, redirect }) => {
   const authCode = url.searchParams.get("code");
@@ -23,5 +25,5 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
     path: "/",
   });
 
-  return redirect("/perfil");
+  return redirect(getRelativeLocaleUrl(idiomaPorDefecto, "/perfil"));
 };

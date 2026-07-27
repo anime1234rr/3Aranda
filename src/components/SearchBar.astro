@@ -1,26 +1,27 @@
 ---
 import { Search } from "lucide-react";
 import { buttonVariants } from "./ui/button";
+import { obtenerIdioma, textos } from "../lib/i18n";
 
 export interface Props {
   placeholder?: string;
   value?: string;
 }
 
+const t = textos[obtenerIdioma(Astro.currentLocale)];
+
 const {
-  placeholder = "Buscar recuerdos, fechas, personas…",
+  placeholder = t.buscarPlaceholder,
   value = "",
 } = Astro.props;
 ---
 
 <div class="w-full">
   <div class="relative group">
-    <!-- Icono lupa -->
     <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
       <Search className="w-5 h-5 text-amber-400 group-focus-within:text-amber-300 transition-colors duration-200" strokeWidth={2.5} />
     </div>
 
-    <!-- Input -->
     <input
       type="search"
       id="family-search"
@@ -33,19 +34,17 @@ const {
       autocomplete="off"
     />
 
-    <!-- Botón buscar -->
     <button
       type="submit"
       class:list={[buttonVariants({ variant: "default" }), "absolute inset-y-0 right-2 my-2 h-auto px-4"]}
-      aria-label="Buscar"
+      aria-label={t.buscarBoton}
     >
-      Buscar
+      {t.buscarBoton}
     </button>
   </div>
 
-  <!-- Sugerencias rápidas -->
   <div class="flex flex-wrap gap-2 mt-3">
-    {["Navidad", "Cumpleaños", "Verano 2024", "Abuelos"].map((tag) => (
+    {t.buscarSugerencias.map((tag) => (
       <button
         type="button"
         class="text-xs px-3 py-1 bg-stone-900 border border-stone-800 text-amber-400 rounded-full hover:bg-stone-800 hover:border-amber-500/40 transition-all duration-150 font-medium"

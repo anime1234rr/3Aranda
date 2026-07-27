@@ -1,21 +1,22 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "../../layouts/Layout.astro";
 import { Home, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { Label } from "../components/ui/label";
-import { Input } from "../components/ui/input";
-import { buttonVariants } from "../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+import { buttonVariants } from "../../components/ui/button";
 
+const locale = "es";
 const error = Astro.url.searchParams.get("error");
 ---
 
-<Layout title="Entrar" currentPath="/iniciar_sesion" showNav={false}>
+<Layout title="Entrar" showNav={false}>
   <div class="min-h-[70vh] flex items-center justify-center">
     <div class="w-full max-w-md">
 
-      <!-- Card principal -->
       <div class="bg-stone-900 rounded-3xl border border-stone-800 shadow-xl p-8">
 
-        <!-- Logo centrado -->
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
             <Home className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
@@ -25,14 +26,14 @@ const error = Astro.url.searchParams.get("error");
         </div>
 
         {error && (
-          <div class="mb-5 rounded-xl border border-red-800 bg-red-950/50 px-4 py-3 text-sm text-red-300 font-medium">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-5">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
-        <!-- Formulario -->
         <form method="POST" action="/api/auth/login" class="space-y-5">
-          <!-- Usuario o correo -->
+          <input type="hidden" name="locale" value={locale} />
+
           <div>
             <Label htmlFor="identificador" className="mb-1.5">Usuario o correo electrónico</Label>
             <div class="relative">
@@ -50,11 +51,10 @@ const error = Astro.url.searchParams.get("error");
             </div>
           </div>
 
-          <!-- Contraseña -->
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <Label htmlFor="password">Contraseña</Label>
-              <a href="/recuperar" class="text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors">
+              <a href={getRelativeLocaleUrl(locale, "/recuperar")} class="text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors">
                 ¿La olvidaste?
               </a>
             </div>
@@ -93,7 +93,7 @@ const error = Astro.url.searchParams.get("error");
 
         <p class="text-center text-sm text-stone-400 font-medium mt-6">
           ¿No tienes cuenta?
-          <a href="/registrar" class="text-amber-400 hover:text-amber-300 font-bold">Regístrate</a>
+          <a href={getRelativeLocaleUrl(locale, "/registrar")} class="text-amber-400 hover:text-amber-300 font-bold">Regístrate</a>
         </p>
       </div>
     </div>
@@ -101,16 +101,18 @@ const error = Astro.url.searchParams.get("error");
 </Layout>
 
 <script>
-  const toggleBtn = document.getElementById("toggle-password");
-  const passwordInput = document.getElementById("password") as HTMLInputElement;
-  const eyeIcon = toggleBtn?.querySelector('[data-icon="eye"]');
-  const eyeOffIcon = toggleBtn?.querySelector('[data-icon="eye-off"]');
+  document.addEventListener("astro:page-load", () => {
+    const toggleBtn = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    const eyeIcon = toggleBtn?.querySelector('[data-icon="eye"]');
+    const eyeOffIcon = toggleBtn?.querySelector('[data-icon="eye-off"]');
 
-  toggleBtn?.addEventListener("click", () => {
-    const willShow = passwordInput.type === "password";
-    passwordInput.type = willShow ? "text" : "password";
-    eyeIcon?.classList.toggle("hidden", willShow);
-    eyeOffIcon?.classList.toggle("hidden", !willShow);
-    toggleBtn.setAttribute("aria-label", willShow ? "Ocultar contraseña" : "Mostrar contraseña");
+    toggleBtn?.addEventListener("click", () => {
+      const willShow = passwordInput.type === "password";
+      passwordInput.type = willShow ? "text" : "password";
+      eyeIcon?.classList.toggle("hidden", willShow);
+      eyeOffIcon?.classList.toggle("hidden", !willShow);
+      toggleBtn.setAttribute("aria-label", willShow ? "Ocultar contraseña" : "Mostrar contraseña");
+    });
   });
 </script>

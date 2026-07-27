@@ -118,6 +118,42 @@ export interface Database {
         };
         Relationships: [];
       };
+      recuerdos: {
+        Row: {
+          id: string;
+          usuario_id: string;
+          titulo: string;
+          descripcion: string | null;
+          media_url: string;
+          media_type: string;
+          categoria: string | null;
+          fecha: string | null;
+          creado_at: string;
+        };
+        Insert: {
+          id?: string;
+          usuario_id: string;
+          titulo: string;
+          descripcion?: string | null;
+          media_url: string;
+          media_type?: string;
+          categoria?: string | null;
+          fecha?: string | null;
+          creado_at?: string;
+        };
+        Update: {
+          id?: string;
+          usuario_id?: string;
+          titulo?: string;
+          descripcion?: string | null;
+          media_url?: string;
+          media_type?: string;
+          categoria?: string | null;
+          fecha?: string | null;
+          creado_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

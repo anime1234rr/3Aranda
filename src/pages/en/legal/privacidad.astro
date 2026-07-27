@@ -1,0 +1,52 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { ShieldCheck } from "lucide-react";
+---
+
+<Layout title="Privacy">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+        <ShieldCheck className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+      </div>
+      <h1 class="text-2xl font-extrabold text-stone-100">Privacy</h1>
+      <p class="text-stone-400 text-sm mt-1 font-medium">How we look after your data and your memories</p>
+    </div>
+
+    <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6 space-y-6 text-sm leading-relaxed text-stone-400">
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">What we store</h2>
+        <p>
+          Your email, username, and password (handled by Supabase Auth — we never see it in plain
+          text), and whatever you upload: photos, videos, titles, descriptions, and memory dates.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">How your files are kept safe</h2>
+        <p>
+          Each photo or video is stored in a per-user folder, protected by row-level security (RLS)
+          policies: only you can upload or delete inside your own folder, and access credentials
+          always travel encrypted.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Who can see your memories</h2>
+        <p>
+          Right now, memories you upload are visible to anyone who visits the platform — it's built
+          to be shared within the family. We don't sell your data or share it with third parties
+          for commercial purposes.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="font-extrabold text-stone-100 mb-1.5">Services we use</h2>
+        <p>
+          We host the database and files on Supabase, and publish the site on Netlify. Neither uses
+          your data for advertising.
+        </p>
+      </section>
+    </div>
+  </div>
+</Layout>

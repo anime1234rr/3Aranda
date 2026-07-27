@@ -1,7 +1,9 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import NavBar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import { obtenerIdioma, textos } from "../lib/i18n";
 import '../styles/global.css';
 
 export interface Props {
@@ -16,26 +18,29 @@ const {
   currentPath = Astro.url.pathname,
   showNav = true,
 } = Astro.props;
+
+const locale = obtenerIdioma(Astro.currentLocale);
+const t = textos[locale];
 ---
 
 <!doctype html>
-<html lang="es" class="h-full dark">
+<html lang={locale} class="h-full dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} — Aranda</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Google Font: Nunito (familiar, redondeado) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <ClientRouter />
   </head>
 
   <body class="h-full flex flex-col bg-background font-[Nunito] text-foreground antialiased">
-    <Header title={title} subtitle="Recuerdos en familia" />
+    <Header title={title} subtitle={t.subtitulo} />
 
     {showNav && <NavBar currentPath={currentPath} />}
 

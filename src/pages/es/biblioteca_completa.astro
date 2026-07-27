@@ -1,15 +1,18 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "../../layouts/Layout.astro";
 import { Library } from "lucide-react";
+
+const locale = "es";
 ---
 
-<Layout title="Biblioteca completa" currentPath="/biblioteca_completa">
+<Layout title="Biblioteca completa">
   <div class="flex flex-col items-center justify-center py-20 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
     <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
       <Library className="w-10 h-10" strokeWidth={1.5} />
     </div>
     <h1 class="text-xl font-extrabold text-stone-100">Biblioteca completa</h1>
     <p class="text-stone-400 font-medium mt-2">Próximamente podrás ver todos los documentos aquí</p>
-    <a href="/" class="text-amber-500 text-sm mt-4 font-bold hover:underline">Volver al inicio</a>
+    <a href={getRelativeLocaleUrl(locale, "/")} class="text-amber-500 text-sm mt-4 font-bold hover:underline">Volver al inicio</a>
   </div>
 </Layout>

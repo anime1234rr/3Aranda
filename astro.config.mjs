@@ -8,6 +8,25 @@ export default defineConfig({
   output: 'server',
   adapter: netlify(),
 
+  prefetch: true,
+
+  i18n: {
+    locales: ['es', 'en'],
+    defaultLocale: 'es',
+    routing: {
+      prefixDefaultLocale: true,
+    },
+  },
+
+  image: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ammokuvfnnrgyklspcvt.supabase.co',
+      },
+    ],
+  },
+
   vite: {
     plugins: [
       tailwindcss(),

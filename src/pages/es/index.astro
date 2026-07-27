@@ -1,0 +1,94 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "../../layouts/Layout.astro";
+import Card from "../../components/Card.astro";
+import SearchBar from "../../components/SearchBar.astro";
+import { supabase } from "../../lib/supabase";
+import { Inbox } from "lucide-react";
+
+const locale = "es";
+
+const ETIQUETAS: Record<string, string> = {
+  navidad: "🎄 Navidad",
+  cumpleanos: "🎂 Cumpleaños",
+  vacaciones: "✈️ Vacaciones",
+  familia: "👨‍👩‍👧‍👦 Reunión familiar",
+  logro: "🏆 Logro",
+  otro: "💛 Otro",
+};
+const COLOR_POR_CATEGORIA: Record<string, "amber" | "rose" | "green" | "blue"> = {
+  navidad: "rose",
+  cumpleanos: "amber",
+  vacaciones: "blue",
+  familia: "green",
+  logro: "amber",
+  otro: "amber",
+};
+
+const { data: filas } = await supabase
+  .from("recuerdos")
+  .select("*")
+  .order("creado_at", { ascending: false })
+  .limit(4);
+
+const recentMemories = (filas ?? []).map((r) => ({
+  title: r.titulo,
+  description: r.descripcion ?? undefined,
+  media: r.media_url,
+  mediaType: r.media_type as "image" | "gif" | "video",
+  date: new Date(r.fecha ?? r.creado_at).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }),
+  tag: r.categoria ? ETIQUETAS[r.categoria] : undefined,
+  tagColor: r.categoria ? COLOR_POR_CATEGORIA[r.categoria] : undefined,
+}));
+---
+
+<Layout title="2Aranda">
+  <section class="mb-12 relative overflow-hidden">
+    <div class="absolute top-0 left-1/4 -z-10 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl"></div>
+
+    <div class="rounded-3xl border border-stone-800 bg-stone-900/50 p-8 md:p-12">
+      <div class="max-w-2xl">
+        <h2 class="text-4xl font-black text-stone-100 leading-tight md:text-5xl">
+          los recuerdo de <span class="text-amber-500 italic">Aranda.</span>
+        </h2>
+        <p class="text-stone-400 mt-4 text-lg font-medium">
+          Gestiona, y guarda las imagenes y videos que guardes
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <SearchBar placeholder="Buscar documentos por título, categoría o etiquetas..." />
+  </section>
+
+  <section>
+    <div class="flex items-center justify-between mb-8 border-b border-stone-800 pb-4">
+      <h2 class="text-2xl font-bold text-stone-100 flex items-center gap-2">
+        <span class="text-amber-500">#</span> Documentos recientes
+      </h2>
+      <a href={getRelativeLocaleUrl(locale, "/biblioteca_completa")} class="text-sm text-stone-400 hover:text-amber-500 font-bold transition-colors">
+        Ver biblioteca completa →
+      </a>
+    </div>
+
+    {recentMemories.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {recentMemories.map((memory) => (
+          <Card {...memory} />
+        ))}
+      </div>
+    ) : (
+      <div class="flex flex-col items-center justify-center py-20 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
+        <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
+          <Inbox className="w-10 h-10" strokeWidth={1.5} />
+        </div>
+        <p class="text-stone-400 font-medium">Aún no hay documentos subidos</p>
+      </div>
+    )}
+  </section>
+</Layout>

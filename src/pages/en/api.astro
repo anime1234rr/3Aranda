@@ -1,0 +1,33 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "../../layouts/Layout.astro";
+import { Code2 } from "lucide-react";
+
+const locale = "en";
+---
+
+<Layout title="API">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+        <Code2 className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+      </div>
+      <h1 class="text-2xl font-extrabold text-stone-100">API</h1>
+    </div>
+
+    <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6">
+      <p class="text-stone-400 text-sm leading-relaxed">
+        3Aranda doesn't offer a public API for third-party integrations at this time. All server
+        logic (login, uploading memories) is for internal platform use only.
+      </p>
+      <p class="text-stone-400 text-sm leading-relaxed mt-4">
+        If you ever need to connect 3Aranda with another tool, reach out to whoever manages your
+        family account to talk about what's possible.
+      </p>
+    </div>
+
+    <a href={getRelativeLocaleUrl(locale, "/")} class="text-amber-500 text-sm mt-4 font-bold hover:underline inline-block">
+      Back to home
+    </a>
+  </div>
+</Layout>

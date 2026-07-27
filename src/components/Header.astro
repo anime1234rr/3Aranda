@@ -1,6 +1,10 @@
 ---
-import { Home, Bell, Upload } from "lucide-react";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { Home, Bell } from "lucide-react";
+import SubirRecuerdoDialog from "./SubirRecuerdoDialog.astro";
+import MenuDesplegable from "./MenuDesplegable";
 import { buttonVariants } from "./ui/button";
+import { idiomas, obtenerIdioma, textos } from "../lib/i18n";
 
 export interface Props {
   title?: string;
@@ -8,11 +12,18 @@ export interface Props {
 }
 
 const { title = "Aranda", subtitle = "" } = Astro.props;
+const locale = obtenerIdioma(Astro.currentLocale);
+const t = textos[locale];
+const user = Astro.locals.user;
+
+const pathSinLocale = Astro.url.pathname.replace(/^\/(es|en)(\/|$)/, "/");
+const hrefsPorIdioma = Object.fromEntries(
+  idiomas.map((l) => [l, getRelativeLocaleUrl(l, pathSinLocale)])
+) as Record<(typeof idiomas)[number], string>;
 ---
 
 <header class="bg-stone-950 border-b-4 border-amber-500/30 shadow-md">
   <div class="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-    <!-- Logo + Título -->
     <div class="flex items-center gap-3">
       <div class="bg-amber-400 rounded-2xl w-12 h-12 flex items-center justify-center shadow-sm">
         <Home className="w-6 h-6 text-stone-900" strokeWidth={2.5} />
@@ -25,28 +36,32 @@ const { title = "Aranda", subtitle = "" } = Astro.props;
       </div>
     </div>
 
-    <!-- Acciones rápidas -->
     <div class="flex items-center gap-3">
       <button
         class="relative bg-stone-900 border-2 border-stone-800 rounded-xl px-3 py-2 text-amber-400 hover:bg-stone-800 hover:border-amber-500/50 transition-all duration-200 flex items-center gap-1.5 text-sm font-semibold shadow-sm"
-        aria-label="Notificaciones"
+        aria-label={t.notificaciones}
       >
         <Bell className="w-4 h-4" />
         <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">3</span>
       </button>
 
-      <a
-        href="/subir_imagen"
-        class:list={[buttonVariants({ variant: "default", size: "lg" }), "h-auto py-2"]}
-      >
-        <Upload className="w-4 h-4" />
-        <span class="hidden sm:inline">Subir</span>
-      </a>
+      {user ? (
+        <SubirRecuerdoDialog locale={locale} />
+      ) : (
+        <a
+          href={getRelativeLocaleUrl(locale, "/iniciar_sesion")}
+          class:list={[buttonVariants({ variant: "default" }), "h-auto py-2"]}
+        >
+          {t.navSubir}
+        </a>
+      )}
 
-      <!-- Avatar familiar -->
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm cursor-pointer hover:scale-105 transition-transform duration-200">
-        FH
-      </div>
+      <MenuDesplegable
+        client:load
+        idiomaActual={locale}
+        idiomaLabel={t.idiomaMenu}
+        hrefsPorIdioma={hrefsPorIdioma}
+      />
     </div>
   </div>
 </header>

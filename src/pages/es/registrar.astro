@@ -1,0 +1,131 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "../../layouts/Layout.astro";
+import { Home, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+import { buttonVariants } from "../../components/ui/button";
+
+const locale = "es";
+const error = Astro.url.searchParams.get("error");
+---
+
+<Layout title="Registrarse" showNav={false}>
+  <div class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-md">
+
+      <div class="bg-stone-900 rounded-3xl border border-stone-800 shadow-xl p-8">
+
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+            <Home className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+          </div>
+          <h1 class="text-2xl font-extrabold text-amber-400">Únete a FamilyHub</h1>
+          <p class="text-stone-400 text-sm mt-1 font-medium">Crea tu cuenta familiar 💛</p>
+        </div>
+
+        {error && (
+          <Alert variant="destructive" className="mb-5">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <form method="POST" action="/api/auth/register" class="space-y-5">
+          <input type="hidden" name="locale" value={locale} />
+
+          <div>
+            <Label htmlFor="nombre_usuario" className="mb-1.5">Nombre de usuario</Label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center text-amber-400 pointer-events-none">
+                <User className="w-4 h-4" />
+              </span>
+              <Input
+                type="text"
+                id="nombre_usuario"
+                name="nombre_usuario"
+                placeholder="tu nombre"
+                autoComplete="username"
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="email" className="mb-1.5">Correo electrónico</Label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center text-amber-400 pointer-events-none">
+                <Mail className="w-4 h-4" />
+              </span>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="tu@correo.com"
+                autoComplete="email"
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="password" className="mb-1.5">Contraseña</Label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center text-amber-400 pointer-events-none">
+                <Lock className="w-4 h-4" />
+              </span>
+              <Input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                minLength={6}
+                className="pl-10 pr-10"
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                aria-label="Mostrar contraseña"
+                class="absolute inset-y-0 right-3.5 flex items-center text-stone-400 hover:text-amber-400 transition-colors"
+              >
+                <Eye className="w-4 h-4" data-icon="eye" />
+                <EyeOff className="w-4 h-4 hidden" data-icon="eye-off" />
+              </button>
+            </div>
+            <p class="text-xs text-stone-500 mt-1.5">Mínimo 6 caracteres.</p>
+          </div>
+
+          <button
+            type="submit"
+            class:list={[buttonVariants({ variant: "default" }), "w-full h-auto py-3 text-base"]}
+          >
+            Crear cuenta
+          </button>
+        </form>
+
+        <p class="text-center text-sm text-stone-400 font-medium mt-6">
+          ¿Ya tienes cuenta?
+          <a href={getRelativeLocaleUrl(locale, "/iniciar_sesion")} class="text-amber-400 hover:text-amber-300 font-bold">Entra aquí</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const toggleBtn = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    const eyeIcon = toggleBtn?.querySelector('[data-icon="eye"]');
+    const eyeOffIcon = toggleBtn?.querySelector('[data-icon="eye-off"]');
+
+    toggleBtn?.addEventListener("click", () => {
+      const willShow = passwordInput.type === "password";
+      passwordInput.type = willShow ? "text" : "password";
+      eyeIcon?.classList.toggle("hidden", willShow);
+      eyeOffIcon?.classList.toggle("hidden", !willShow);
+      toggleBtn.setAttribute("aria-label", willShow ? "Ocultar contraseña" : "Mostrar contraseña");
+    });
+  });
+</script>

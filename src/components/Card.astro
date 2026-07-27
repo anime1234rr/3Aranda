@@ -1,11 +1,13 @@
 ---
+import { Image } from "astro:assets";
 import { ImageOff, Calendar } from "lucide-react";
 import { Badge } from "./ui/badge";
 
 export interface Props {
   title: string;
   description?: string;
-  image?: string;
+  media?: string;
+  mediaType?: "image" | "gif" | "video";
   date?: string;
   tag?: string;
   tagColor?: "amber" | "rose" | "green" | "blue";
@@ -15,7 +17,8 @@ export interface Props {
 const {
   title,
   description,
-  image,
+  media,
+  mediaType = "image",
   date,
   tag,
   tagColor = "amber",
@@ -27,14 +30,31 @@ const {
   href={href}
   class="group block bg-stone-900 rounded-2xl border border-stone-800 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-amber-500/40 transition-all duration-300 overflow-hidden"
 >
-  <!-- Imagen / placeholder -->
-  {image ? (
+  {media ? (
     <div class="h-44 overflow-hidden bg-stone-800">
-      <img
-        src={image}
-        alt={title}
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-      />
+      {mediaType === "video" ? (
+        <video
+          src={media}
+          controls
+          muted
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : mediaType === "gif" ? (
+        // Se sirve como <img> plano (sin astro:assets) para conservar la animación del GIF.
+        <img
+          src={media}
+          alt={title}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <Image
+          src={media}
+          alt={title}
+          width={400}
+          height={300}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      )}
     </div>
   ) : (
     <div class="h-44 bg-gradient-to-br from-stone-800 to-stone-900 flex items-center justify-center">
@@ -42,7 +62,6 @@ const {
     </div>
   )}
 
-  <!-- Contenido -->
   <div class="p-5">
     {tag && (
       <Badge variant={tagColor} className="mb-3">{tag}</Badge>

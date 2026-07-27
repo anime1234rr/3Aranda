@@ -1,0 +1,237 @@
+---
+import { Upload, FolderOpen, Calendar, Tag, Save, X } from "lucide-react";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { buttonVariants } from "./ui/button";
+import { textos, type Idioma } from "../lib/i18n";
+
+export interface Props {
+  locale: Idioma;
+}
+
+const { locale } = Astro.props;
+const t = textos[locale];
+---
+
+<button
+  type="button"
+  data-upload-trigger
+  class:list={[buttonVariants({ variant: "default" }), "h-auto py-2"]}
+>
+  <Upload className="w-4 h-4" />
+  {t.navSubir}
+</button>
+
+<dialog
+  id="subir-recuerdo-modal"
+  class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-3xl border border-stone-800 bg-stone-900 p-0 shadow-2xl backdrop:bg-stone-950/80 backdrop:backdrop-blur-sm"
+>
+  <form
+    id="upload-form"
+    enctype="multipart/form-data"
+    class="max-h-[85vh] overflow-y-auto p-6 space-y-5 sm:p-8"
+  >
+    <input type="hidden" name="locale" value={locale} />
+
+    <div class="flex items-center justify-between">
+      <h2 class="flex items-center gap-2 text-xl font-extrabold text-stone-100">
+        <Upload className="w-5 h-5 text-amber-400" /> {t.modalTitulo}
+      </h2>
+      <button
+        type="button"
+        data-upload-close
+        aria-label="Cerrar"
+        class="text-stone-500 transition-colors hover:text-stone-200"
+      >
+        <X className="w-5 h-5" />
+      </button>
+    </div>
+
+    <div>
+      <Label className="mb-2">{t.modalArchivos}</Label>
+      <div
+        id="dropzone"
+        class="relative cursor-pointer rounded-2xl border-2 border-dashed border-stone-700 bg-stone-950/40 p-8 text-center transition-all duration-200 hover:border-amber-500/50 hover:bg-stone-800/60"
+      >
+        <input
+          type="file"
+          id="file-input"
+          name="files"
+          multiple
+          accept="image/*,video/*"
+          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+        <div class="pointer-events-none flex flex-col items-center">
+          <FolderOpen className="mb-2 w-10 h-10 text-amber-400" strokeWidth={1.5} />
+          <p class="text-sm font-extrabold text-amber-400">{t.modalArrastra}</p>
+          <p class="mt-1 text-xs text-stone-400">{t.modalOClic}</p>
+          <p class="mt-2 text-xs text-stone-500">{t.modalFormatos}</p>
+        </div>
+      </div>
+
+      <div id="preview" class="mt-4 hidden grid-cols-3 gap-3"></div>
+    </div>
+
+    <div>
+      <Label htmlFor="title" className="mb-1.5">
+        {t.modalTituloCampo} <span class="text-rose-400">*</span>
+      </Label>
+      <Input type="text" id="title" name="title" placeholder={t.modalTituloPlaceholder} required />
+    </div>
+
+    <div>
+      <Label htmlFor="description" className="mb-1.5">{t.modalDescripcion}</Label>
+      <Textarea id="description" name="description" rows={3} placeholder={t.modalDescripcionPlaceholder} />
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div>
+        <Label htmlFor="date" className="mb-1.5">
+          <Calendar className="w-4 h-4" /> {t.modalFecha}
+        </Label>
+        <Input type="date" id="date" name="date" />
+      </div>
+
+      <div>
+        <Label htmlFor="tag" className="mb-1.5">
+          <Tag className="w-4 h-4" /> {t.modalCategoria}
+        </Label>
+        <select
+          id="tag"
+          name="tag"
+          class="flex h-11 w-full cursor-pointer rounded-xl border border-stone-800 bg-stone-950/40 px-4 py-2 text-sm font-medium text-stone-100 transition-all duration-200 hover:border-stone-700 focus:outline-none focus-visible:border-amber-500/60 focus-visible:ring-3 focus-visible:ring-amber-500/20"
+        >
+          {t.modalCategoriaOpciones.map((opcion) => (
+            <option value={opcion.value}>{opcion.label}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <p
+      id="upload-error"
+      data-error-generico={t.modalError}
+      class="hidden rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-400"
+    ></p>
+
+    <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+      <button
+        type="submit"
+        class:list={[buttonVariants({ variant: "default" }), "h-auto flex-1 py-3.5 text-base"]}
+      >
+        <Save className="w-4 h-4" />
+        {t.modalGuardar}
+      </button>
+      <button
+        type="button"
+        data-upload-close
+        class:list={[buttonVariants({ variant: "outline" }), "h-auto flex-1 py-3.5 text-base"]}
+      >
+        <X className="w-4 h-4" />
+        {t.modalCancelar}
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  import { actions } from "astro:actions";
+
+  // Con <ClientRouter /> el DOM se reemplaza en cada navegación, así que este
+  // script debe volver a engancharse en astro:page-load, no solo al cargar.
+  document.addEventListener("astro:page-load", () => {
+    const modal = document.getElementById("subir-recuerdo-modal") as HTMLDialogElement;
+    const form = document.getElementById("upload-form") as HTMLFormElement;
+    const errorBox = document.getElementById("upload-error") as HTMLParagraphElement;
+    const submitBtn = form?.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const input = document.getElementById("file-input") as HTMLInputElement;
+    const preview = document.getElementById("preview") as HTMLDivElement;
+    const dropzone = document.getElementById("dropzone");
+    const errorGenerico = form?.dataset.errorGenerico ?? errorBox?.dataset.errorGenerico ?? "Error";
+
+    function cerrarModal() {
+      modal?.close();
+      form?.reset();
+      preview.innerHTML = "";
+      preview.classList.add("hidden");
+      preview.classList.remove("grid");
+      errorBox?.classList.add("hidden");
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-upload-trigger]").forEach((btn) => {
+      btn.addEventListener("click", () => modal?.showModal());
+    });
+
+    document.querySelectorAll<HTMLElement>("[data-upload-close]").forEach((btn) => {
+      btn.addEventListener("click", cerrarModal);
+    });
+
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) cerrarModal();
+    });
+
+    input?.addEventListener("change", () => {
+      const files = input.files;
+      if (!files || files.length === 0) return;
+
+      preview.innerHTML = "";
+      preview.classList.remove("hidden");
+      preview.classList.add("grid");
+
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement("div");
+          div.className = "relative rounded-xl overflow-hidden border border-stone-800 aspect-square bg-stone-950/40";
+
+          if (file.type.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = e.target?.result as string;
+            img.className = "w-full h-full object-cover";
+            div.appendChild(img);
+          } else {
+            div.innerHTML = `<div class="flex items-center justify-center h-full text-3xl">🎥</div>`;
+          }
+
+          const name = document.createElement("p");
+          name.textContent = file.name;
+          name.className = "absolute bottom-0 left-0 right-0 bg-stone-950/80 text-stone-100 text-xs px-2 py-1 font-medium truncate";
+          div.appendChild(name);
+
+          preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    dropzone?.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("border-amber-500", "bg-stone-800/60");
+    });
+    dropzone?.addEventListener("dragleave", () => {
+      dropzone.classList.remove("border-amber-500", "bg-stone-800/60");
+    });
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox?.classList.add("hidden");
+      submitBtn?.setAttribute("disabled", "true");
+
+      try {
+        const { error } = await actions.subirRecuerdo(new FormData(form));
+        if (error) throw new Error(error.message || errorGenerico);
+
+        cerrarModal();
+        window.location.reload();
+      } catch (err) {
+        if (errorBox) {
+          errorBox.textContent = err instanceof Error ? err.message : errorGenerico;
+          errorBox.classList.remove("hidden");
+        }
+      } finally {
+        submitBtn?.removeAttribute("disabled");
+      }
+    });
+  });
+</script>

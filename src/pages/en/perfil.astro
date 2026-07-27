@@ -1,31 +1,22 @@
 ---
 export const prerender = false;
 
-import Layout from "../layouts/Layout.astro";
+import Layout from "../../layouts/Layout.astro";
 import { User, LogOut, Star, Shield } from "lucide-react";
-import { supabase } from "../lib/supabase";
-import { buttonVariants } from "../components/ui/button";
+import { supabase } from "../../lib/supabase";
+import { buttonVariants } from "../../components/ui/button";
 
-const accessToken = Astro.cookies.get("sb-access-token")?.value;
-
-if (!accessToken) {
-  return Astro.redirect("/iniciar_sesion");
-}
-
-const { data: userData, error: userError } = await supabase.auth.getUser(accessToken);
-
-if (userError || !userData.user) {
-  return Astro.redirect("/iniciar_sesion");
-}
+// The middleware (src/middleware.ts) already redirects to /iniciar_sesion if there's no session.
+const user = Astro.locals.user!;
 
 const { data: perfil } = await supabase
   .from("perfiles")
   .select("*")
-  .eq("id", userData.user.id)
+  .eq("id", user.id)
   .single();
 ---
 
-<Layout title="Mi perfil" currentPath="/perfil">
+<Layout title="My profile">
   <div class="max-w-2xl mx-auto">
     <div class="bg-stone-900 rounded-3xl border border-stone-800 shadow-md p-8">
       <div class="flex items-center gap-4">
@@ -34,9 +25,9 @@ const { data: perfil } = await supabase
         </div>
         <div>
           <h1 class="text-xl font-extrabold text-stone-100">
-            {perfil?.nombre_completo || perfil?.nombre_usuario || userData.user.email}
+            {perfil?.nombre_completo || perfil?.nombre_usuario || user.email}
           </h1>
-          <p class="text-sm text-stone-400 font-medium">@{perfil?.nombre_usuario ?? "sin_nombre"}</p>
+          <p class="text-sm text-stone-400 font-medium">@{perfil?.nombre_usuario ?? "no_name"}</p>
         </div>
       </div>
 
@@ -49,14 +40,14 @@ const { data: perfil } = await supabase
           <Star className="w-5 h-5 text-amber-400" />
           <div>
             <p class="text-lg font-extrabold text-stone-100">{perfil?.puntos ?? 0}</p>
-            <p class="text-xs text-stone-500 font-medium">Puntos</p>
+            <p class="text-xs text-stone-500 font-medium">Points</p>
           </div>
         </div>
         <div class="bg-stone-950/40 border border-stone-800 rounded-2xl p-4 flex items-center gap-3">
           <Shield className="w-5 h-5 text-amber-400" />
           <div>
-            <p class="text-lg font-extrabold text-stone-100 capitalize">{perfil?.rol ?? "usuario"}</p>
-            <p class="text-xs text-stone-500 font-medium">Rol</p>
+            <p class="text-lg font-extrabold text-stone-100 capitalize">{perfil?.rol ?? "user"}</p>
+            <p class="text-xs text-stone-500 font-medium">Role</p>
           </div>
         </div>
       </div>
@@ -66,7 +57,7 @@ const { data: perfil } = await supabase
         class:list={[buttonVariants({ variant: "outline" }), "w-full h-auto py-3 mt-8"]}
       >
         <LogOut className="w-4 h-4" />
-        Cerrar sesión
+        Log out
       </a>
     </div>
   </div>

@@ -1,0 +1,120 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { supabase } from "../../lib/supabase";
+import { Sparkles, Clock, Heart, MessageCircle } from "lucide-react";
+import { Badge } from "../../components/ui/badge";
+
+const ETIQUETAS: Record<string, string> = {
+  navidad: "🎄 Navidad",
+  cumpleanos: "🎂 Cumpleaños",
+  vacaciones: "✈️ Vacaciones",
+  familia: "👨‍👩‍👧‍👦 Reunión familiar",
+  logro: "🏆 Logro",
+  otro: "💛 Otro",
+};
+const COLOR_POR_CATEGORIA: Record<string, "amber" | "rose" | "green" | "blue"> = {
+  navidad: "rose",
+  cumpleanos: "amber",
+  vacaciones: "blue",
+  familia: "green",
+  logro: "amber",
+  otro: "amber",
+};
+
+// TODO: sumar conteos reales de `comentarios`/`reacciones` (no tienen FK declarada hacia recuerdos.id todavía).
+const { data: filas } = await supabase
+  .from("recuerdos")
+  .select("*")
+  .order("fecha", { ascending: false, nullsFirst: false })
+  .order("creado_at", { ascending: false });
+
+const recuerdos = (filas ?? []).map((r) => ({
+  id: r.id,
+  titulo: r.titulo,
+  descripcion: r.descripcion ?? undefined,
+  fecha: r.fecha ?? r.creado_at,
+  autor: undefined as string | undefined,
+  tag: r.categoria ? ETIQUETAS[r.categoria] : undefined,
+  tagColor: r.categoria ? COLOR_POR_CATEGORIA[r.categoria] : undefined,
+  reacciones: 0,
+  comentarios: 0,
+}));
+
+const porAnio = recuerdos.reduce<Record<string, typeof recuerdos>>((acc, r) => {
+  const anio = new Date(r.fecha).getFullYear().toString();
+  (acc[anio] ??= []).push(r);
+  return acc;
+}, {});
+const anios = Object.keys(porAnio).sort((a, b) => Number(b) - Number(a));
+---
+
+<Layout title="Recuerdos">
+  <section class="mb-10">
+    <h1 class="text-3xl font-black text-stone-100 flex items-center gap-2">
+      <Sparkles className="w-7 h-7 text-amber-400" /> Línea de recuerdos
+    </h1>
+    <p class="text-stone-400 text-sm mt-1 font-medium">
+      Los momentos más especiales de la familia, contados en el tiempo
+    </p>
+  </section>
+
+  {anios.length > 0 ? (
+    <div class="space-y-14">
+      {anios.map((anio) => (
+        <section>
+          <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-stone-900 border border-amber-500/30 px-4 py-1.5 shadow-sm">
+            <span class="text-amber-400 font-black text-sm">{anio}</span>
+          </div>
+
+          <ol class="relative border-l-2 border-stone-800 ml-3 space-y-8">
+            {porAnio[anio].map((r) => (
+              <li class="relative pl-8">
+                <span class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-amber-400 ring-4 ring-stone-950"></span>
+
+                <div class="bg-stone-900 rounded-2xl border border-stone-800 p-5 hover:border-amber-500/40 transition-colors duration-200">
+                  <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <div class="flex items-center gap-1.5 text-xs text-stone-500 font-semibold">
+                      <Clock className="w-3.5 h-3.5" />
+                      {new Date(r.fecha).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </div>
+                    {r.tag && <Badge variant={r.tagColor ?? "amber"}>{r.tag}</Badge>}
+                  </div>
+
+                  <h3 class="font-extrabold text-stone-100 text-lg mb-1">{r.titulo}</h3>
+                  {r.descripcion && (
+                    <p class="text-stone-400 text-sm leading-relaxed">{r.descripcion}</p>
+                  )}
+
+                  <div class="flex items-center justify-between mt-4 pt-4 border-t border-stone-800">
+                    <span class="text-xs text-stone-500 font-medium">
+                      {r.autor ? `Compartido por ${r.autor}` : ""}
+                    </span>
+                    <div class="flex items-center gap-4 text-stone-400 text-sm font-semibold">
+                      <span class="flex items-center gap-1">
+                        <Heart className="w-4 h-4" /> {r.reacciones ?? 0}
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <MessageCircle className="w-4 h-4" /> {r.comentarios ?? 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+  ) : (
+    <div class="flex flex-col items-center justify-center py-24 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
+      <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
+        <Sparkles className="w-10 h-10" strokeWidth={1.5} />
+      </div>
+      <p class="text-stone-400 font-medium">Todavía no hay recuerdos guardados</p>
+    </div>
+  )}
+</Layout>

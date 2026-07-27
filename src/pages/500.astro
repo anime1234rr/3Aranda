@@ -1,0 +1,31 @@
+---
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import { AlertTriangle } from "lucide-react";
+
+export interface Props {
+  error: unknown;
+}
+
+const { error } = Astro.props;
+const detalle = error instanceof Error ? error.message : String(error ?? "");
+---
+
+<Layout title="Error del servidor" currentPath="/500">
+  <div class="flex flex-col items-center justify-center py-24 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
+    <div class="p-4 rounded-full bg-stone-800 text-rose-400 mb-4">
+      <AlertTriangle className="w-10 h-10" strokeWidth={1.5} />
+    </div>
+    <h1 class="text-2xl font-black text-stone-100">Algo salió mal</h1>
+    <p class="text-stone-400 font-medium mt-2">
+      Ocurrió un error inesperado en el servidor. Ya estamos al tanto.
+    </p>
+    {import.meta.env.DEV && detalle && (
+      <p class="text-rose-400/80 text-xs font-mono mt-4 max-w-lg text-center break-words">
+        {detalle}
+      </p>
+    )}
+    <a href="/" class="text-amber-500 text-sm mt-4 font-bold hover:underline">Volver al inicio</a>
+  </div>
+</Layout>

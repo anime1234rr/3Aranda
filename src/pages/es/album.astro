@@ -1,0 +1,117 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Card from "../../components/Card.astro";
+import SearchBar from "../../components/SearchBar.astro";
+import { supabase } from "../../lib/supabase";
+import { Images, ImageOff } from "lucide-react";
+
+const categorias = [
+  { label: "Todas", value: "" },
+  { label: "🎄 Navidad", value: "navidad" },
+  { label: "🎂 Cumpleaños", value: "cumpleanos" },
+  { label: "✈️ Vacaciones", value: "vacaciones" },
+  { label: "👨‍👩‍👧‍👦 Familia", value: "familia" },
+  { label: "🏆 Logros", value: "logro" },
+  { label: "💛 Otro", value: "otro" },
+];
+
+const COLOR_POR_CATEGORIA: Record<string, "amber" | "rose" | "green" | "blue"> = {
+  navidad: "rose",
+  cumpleanos: "amber",
+  vacaciones: "blue",
+  familia: "green",
+  logro: "amber",
+  otro: "amber",
+};
+const etiquetaPorValor = new Map(categorias.filter((c) => c.value).map((c) => [c.value, c.label]));
+
+const { data: filas } = await supabase
+  .from("recuerdos")
+  .select("*")
+  .order("creado_at", { ascending: false });
+
+const fotos = (filas ?? []).map((r) => ({
+  title: r.titulo,
+  description: r.descripcion ?? undefined,
+  media: r.media_url,
+  mediaType: r.media_type as "image" | "gif" | "video",
+  date: new Date(r.fecha ?? r.creado_at).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }),
+  tag: r.categoria ? etiquetaPorValor.get(r.categoria) : undefined,
+  tagColor: r.categoria ? COLOR_POR_CATEGORIA[r.categoria] : undefined,
+}));
+---
+
+<Layout title="Álbum">
+  <section class="mb-10">
+    <div class="mb-6">
+      <h1 class="text-3xl font-black text-stone-100 flex items-center gap-2">
+        <Images className="w-7 h-7 text-amber-400" /> Álbum familiar
+      </h1>
+      <p class="text-stone-400 text-sm mt-1 font-medium">
+        Todas las fotos y vídeos que la familia ha compartido, en un solo lugar
+      </p>
+    </div>
+
+    <SearchBar placeholder="Buscar en el álbum por título, fecha o persona..." />
+  </section>
+
+  <section class="mb-8">
+    <div id="album-filtros" class="flex flex-wrap gap-2">
+      {categorias.map((cat) => (
+        <button
+          type="button"
+          data-filter={cat.value}
+          class:list={[
+            "album-filtro px-4 py-2 rounded-full text-sm font-bold border transition-all duration-200",
+            cat.value === ""
+              ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+              : "bg-stone-900 text-stone-400 border-stone-800 hover:border-amber-500/40 hover:text-amber-300",
+          ]}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    {fotos.length > 0 ? (
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+        {fotos.map((foto) => (
+          <Card {...foto} />
+        ))}
+      </div>
+    ) : (
+      <div class="flex flex-col items-center justify-center py-24 rounded-3xl border-2 border-dashed border-stone-800 bg-stone-900/20">
+        <div class="p-4 rounded-full bg-stone-800 text-stone-500 mb-4">
+          <ImageOff className="w-10 h-10" strokeWidth={1.5} />
+        </div>
+        <p class="text-stone-400 font-medium">El álbum todavía está vacío</p>
+      </div>
+    )}
+  </section>
+</Layout>
+
+<script>
+  // Con <ClientRouter /> el DOM se reemplaza en cada navegación: hay que
+  // volver a enganchar los listeners en astro:page-load, no solo al cargar.
+  document.addEventListener("astro:page-load", () => {
+    const botones = document.querySelectorAll<HTMLButtonElement>(".album-filtro");
+    botones.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        botones.forEach((b) =>
+          b.classList.remove("bg-amber-500/10", "text-amber-400", "border-amber-500/30")
+        );
+        botones.forEach((b) =>
+          b.classList.add("bg-stone-900", "text-stone-400", "border-stone-800")
+        );
+        btn.classList.remove("bg-stone-900", "text-stone-400", "border-stone-800");
+        btn.classList.add("bg-amber-500/10", "text-amber-400", "border-amber-500/30");
+      });
+    });
+  });
+</script>

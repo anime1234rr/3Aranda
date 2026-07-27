@@ -1,7 +1,9 @@
-export const prerender = false; // 
+export const prerender = false; //
 
 import type { APIRoute } from "astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
 import { supabase } from "../../../lib/supabase";
+import { obtenerIdioma } from "../../../lib/i18n";
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const contentType = request.headers.get("content-type");
@@ -10,11 +12,15 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   }
 
   const formData = await request.formData();
+  const locale = obtenerIdioma(formData.get("locale")?.toString());
   const identificador = formData.get("identificador")?.toString().trim();
   const password = formData.get("password")?.toString();
 
+  const urlIniciarSesion = getRelativeLocaleUrl(locale, "/iniciar_sesion");
+  const urlPerfil = getRelativeLocaleUrl(locale, "/perfil");
+
   if (!identificador || !password) {
-    return redirect(`/iniciar_sesion?error=${encodeURIComponent("Usuario/correo y contraseña obligatorios")}`);
+    return redirect(`${urlIniciarSesion}?error=${encodeURIComponent("Usuario/correo y contraseña obligatorios")}`);
   }
 
   let email = identificador;
@@ -26,7 +32,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     );
 
     if (rpcError || !emailEncontrado) {
-      return redirect(`/iniciar_sesion?error=${encodeURIComponent("Usuario o contraseña incorrectos")}`);
+      return redirect(`${urlIniciarSesion}?error=${encodeURIComponent("Usuario o contraseña incorrectos")}`);
     }
 
     email = emailEncontrado;
@@ -38,13 +44,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   });
 
   if (error) {
-    return redirect(`/iniciar_sesion?error=${encodeURIComponent(error.message)}`);
+    return redirect(`${urlIniciarSesion}?error=${encodeURIComponent(error.message)}`);
   }
 
   const { access_token, refresh_token } = data.session;
-  
+
   cookies.set("sb-access-token", access_token, { path: "/", httpOnly: true, secure: true });
   cookies.set("sb-refresh-token", refresh_token, { path: "/", httpOnly: true, secure: true });
-  
-  return redirect("/perfil");
+
+  return redirect(urlPerfil);
 };

@@ -1,0 +1,53 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { LifeBuoy, LogIn, Upload, MessageCircleQuestion } from "lucide-react";
+---
+
+<Layout title="Soporte">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-400 rounded-2xl shadow-inner mb-4">
+        <LifeBuoy className="w-8 h-8 text-stone-900" strokeWidth={2.5} />
+      </div>
+      <h1 class="text-2xl font-extrabold text-stone-100">Soporte</h1>
+      <p class="text-stone-400 text-sm mt-1 font-medium">
+        Ayuda con lo más común, y cómo pedir una mano si hace falta
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6">
+        <div class="flex items-center gap-2 mb-2">
+          <LogIn className="w-5 h-5 text-amber-400" />
+          <h2 class="font-extrabold text-stone-100">No puedo iniciar sesión</h2>
+        </div>
+        <p class="text-stone-400 text-sm leading-relaxed">
+          Revisá que el nombre de usuario o correo esté bien escrito. Si olvidaste tu contraseña,
+          usá el enlace "¿La olvidaste?" en la pantalla de inicio de sesión.
+        </p>
+      </div>
+
+      <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6">
+        <div class="flex items-center gap-2 mb-2">
+          <Upload className="w-5 h-5 text-amber-400" />
+          <h2 class="font-extrabold text-stone-100">No puedo subir una foto o video</h2>
+        </div>
+        <p class="text-stone-400 text-sm leading-relaxed">
+          Confirmá que tenés sesión iniciada (el botón de subir aparece junto a tu avatar) y que el
+          archivo no supere los 50 MB.
+        </p>
+      </div>
+
+      <div class="bg-stone-900 rounded-2xl border border-stone-800 p-6">
+        <div class="flex items-center gap-2 mb-2">
+          <MessageCircleQuestion className="w-5 h-5 text-amber-400" />
+          <h2 class="font-extrabold text-stone-100">Tengo otra duda</h2>
+        </div>
+        <p class="text-stone-400 text-sm leading-relaxed">
+          Contactá a la persona que administra la cuenta familiar (rol "admin" en el perfil) para
+          cualquier otro problema o pedido.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
